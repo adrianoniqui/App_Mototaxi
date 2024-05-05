@@ -59,7 +59,7 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Añadir Imágenes'),
+        title: Text('Añadir Fotos'),
       ),
       body: Padding(
         padding: EdgeInsets.all(20),
