@@ -1,4 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class ImageUploadScreen extends StatefulWidget {
   @override
@@ -13,16 +16,49 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
   ];
 
   Widget imageCard(int index) {
-    // Método auxiliar para obtener la imagen o el placeholder
     ImageProvider getImageOrPlaceholder(ImageProvider? image) {
       return image ?? AssetImage('assets/placeholder.png');
     }
 
-    // Método auxiliar para manejar el onTap
-    void handleImageTap(int idx) {
-      setState(() {
-        images[idx] = images[idx] == null ? AssetImage('assets/placeholder.png') : null;
-      });
+    void handleImageTap(int idx) async {
+      showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+            height: 150,
+            child: Column(
+              children: <Widget>[
+                ListTile(
+                  leading: Icon(Icons.camera),
+                  title: Text('Cámara'),
+                  onTap: () async {
+                    var pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
+                    if (pickedFile != null) {
+                      setState(() {
+                        images[idx] = FileImage(File(pickedFile.path));
+                      });
+                    }
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.photo_library),
+                  title: Text('Galería'),
+                  onTap: () async {
+                    var pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+                    if (pickedFile != null) {
+                      setState(() {
+                        images[idx] = FileImage(File(pickedFile.path));
+                      });
+                    }
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      );
     }
 
     return GestureDetector(
@@ -44,7 +80,7 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
           SizedBox(height: 8),
           ElevatedButton(
             onPressed: () => handleImageTap(index),
-            child: Text(images[index] == null ? 'Añadir' : 'Quitar'),
+            child: Text(images[index] == null ? 'Quitar' : 'Añadir'),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue,
               foregroundColor: Colors.white,
@@ -74,7 +110,6 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                // Implementar la lógica para enviar información al backend
                 print("Enviar imágenes al servidor");
               },
               child: Text('Enviar'),
